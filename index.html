@@ -1,0 +1,558 @@
+<html><head><base href="." ><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق المهام اليومية</title>
+<style>
+:root {
+    --primary-color: #4CAF50;
+    --danger-color: #f44336;
+    --warning-color: #ff9800;
+    --completed-color: #808080;
+    --background-color: #f5f5f5;
+    --text-color: #333;
+    --card-bg: white;
+}
+
+[data-theme="dark"] {
+    --primary-color: #66bb6a;
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --card-bg: #1e1e1e;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease;
+}
+
+.welcome-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: var(--background-color);
+}
+
+.welcome-content {
+    padding: 2rem;
+    border-radius: 15px;
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-content h1 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.welcome-content p {
+    margin-bottom: 2rem;
+    color: var(--text-color);
+}
+
+.welcome-btn {
+    font-size: 1.2rem;
+    padding: 15px 30px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+}
+
+.theme-toggle {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+
+.theme-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    color: var(--text-color);
+    transition: background-color 0.3s ease;
+}
+
+.theme-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.task-form {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.tasks-container {
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.task-item {
+    padding: 15px;
+    border-bottom: 1px solid var(--text-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-title {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.task-time {
+    font-size: 14px;
+    color: #666;
+}
+
+.task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.task-actions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    color: white;
+}
+
+.edit-btn {
+    background-color: var(--warning-color);
+}
+
+.delete-btn {
+    background-color: var(--danger-color);
+}
+
+.complete-btn {
+    background-color: var(--primary-color);
+}
+
+.task-completed {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.task-completed .task-title {
+    text-decoration: line-through;
+}
+
+.task-expired {
+    background-color: #fff3f3;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+@keyframes notification {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--warning-color);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    animation: notification 1s ease;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="welcomePage" class="welcome-page">
+    <div class="welcome-content">
+        <h1>مرحباً بك في تطبيق المهام اليومية</h1>
+        <p>نظّم يومك وحقق أهدافك بسهولة</p>
+        <button class="btn welcome-btn" onclick="showMainApp()">ابدأ الآن</button>
+    </div>
+</div>
+
+<div id="mainApp" class="container" style="display: none;">
+    <div class="header">
+        <div class="theme-toggle">
+            <button id="themeToggle" class="theme-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path class="sun" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    <circle class="sun" cx="12" cy="12" r="5"/>
+                    <path class="moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+        </div>
+        <h1>تطبيق المهام اليومية</h1>
+    </div>
+    
+    <form class="task-form" id="taskForm">
+        <div class="form-group">
+            <label>عنوان المهمة</label>
+            <input type="text" id="taskTitle" required>
+        </div>
+        <div class="form-group">
+            <label>وصف المهمة</label>
+            <textarea id="taskDescription" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label>موعد الانتهاء</label>
+            <input type="datetime-local" id="taskDueDate" required>
+        </div>
+        <button type="submit" class="btn">إضافة مهمة</button>
+    </form>
+    
+    <div class="tasks-container" id="tasksContainer"></div>
+</div>
+
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <form id="editForm">
+            <div class="form-group">
+                <label>عنوان المهمة</label>
+                <input type="text" id="editTitle" required>
+            </div>
+            <div class="form-group">
+                <label>موعد الانتهاء</label>
+                <input type="datetime-local" id="editDueDate" required>
+            </div>
+            <button type="submit" class="btn">حفظ التغييرات</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+}
+
+// Initialize theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+setTheme(savedTheme);
+
+// Welcome page handling
+function showMainApp() {
+    document.getElementById('welcomePage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+}
+
+// Add event listener for theme toggle
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+// Check if user has visited before
+if (localStorage.getItem('hasVisited')) {
+    showMainApp();
+} else {
+    localStorage.setItem('hasVisited', 'true');
+}
+
+class TaskManager {
+    constructor() {
+        this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        this.notifications = {};  // Store notification intervals
+        this.currentEditingTaskId = null; // Add property to store current editing task ID
+        this.init();
+    }
+
+    init() {
+        this.form = document.getElementById('taskForm');
+        this.tasksContainer = document.getElementById('tasksContainer');
+        this.editModal = document.getElementById('editModal');
+        this.editForm = document.getElementById('editForm');
+        
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.editForm.addEventListener('submit', (e) => this.handleEdit(e));
+        this.renderTasks();
+        this.startNotificationCheck();
+        this.startOverdueCheck();
+    }
+
+    handleSubmit(e) {
+        e.preventDefault();
+        const title = document.getElementById('taskTitle').value;
+        const description = document.getElementById('taskDescription').value;
+        const dueDate = document.getElementById('taskDueDate').value;
+
+        const task = {
+            id: Date.now(),
+            title,
+            description,
+            dueDate,
+            completed: false,
+            notified: false
+        };
+
+        this.tasks.push(task);
+        this.saveTasks();
+        this.renderTasks();
+        this.form.reset();
+    }
+
+    handleEdit(e) {
+        e.preventDefault();
+        const editTitle = document.getElementById('editTitle').value;
+        const editDueDate = document.getElementById('editDueDate').value;
+        
+        // Find the task being edited
+        const taskId = this.currentEditingTaskId; // We'll add this property
+        const task = this.tasks.find(task => task.id === taskId);
+        
+        if (task) {
+            task.title = editTitle;
+            task.dueDate = editDueDate;
+            this.saveTasks();
+            this.renderTasks();
+        }
+        
+        this.editModal.classList.remove('show');
+        this.editForm.reset();
+    }
+
+    saveTasks() {
+        localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    }
+
+    deleteTask(id) {
+        this.tasks = this.tasks.filter(task => task.id !== id);
+        this.saveTasks();
+        this.renderTasks();
+    }
+
+    toggleComplete(id) {
+        const task = this.tasks.find(task => task.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            if (task.completed) {
+                // Clear the notification interval when task is completed
+                if (this.notifications[task.id]) {
+                    clearInterval(this.notifications[task.id]);
+                    delete this.notifications[task.id];
+                }
+            }
+            this.saveTasks();
+            this.renderTasks();
+        }
+    }
+
+    editTask(id) {
+        const task = this.tasks.find(task => task.id === id);
+        if (task) {
+            this.currentEditingTaskId = id; // Add this line to store the current editing task ID
+            document.getElementById('editTitle').value = task.title;
+            document.getElementById('editDueDate').value = task.dueDate;
+            this.editModal.classList.add('show');
+        }
+    }
+
+    renderTasks() {
+        this.tasksContainer.innerHTML = '';
+        this.tasks.forEach(task => {
+            const isExpired = new Date(task.dueDate) < new Date() && !task.completed;
+            const taskElement = document.createElement('div');
+            taskElement.className = `task-item ${task.completed ? 'task-completed' : ''} ${isExpired ? 'task-expired' : ''}`;
+            
+            taskElement.innerHTML = `
+                <div class="task-info">
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-time">الموعد: ${new Date(task.dueDate).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: false
+                    })}</div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                </div>
+                <div class="task-actions">
+                    <button class="complete-btn" onclick="taskManager.toggleComplete(${task.id})">
+                        ${task.completed ? 'تراجع' : 'إكمال'}
+                    </button>
+                    <button class="edit-btn" onclick="taskManager.editTask(${task.id})">تعديل</button>
+                    <button class="delete-btn" onclick="taskManager.deleteTask(${task.id})">حذف</button>
+                </div>
+            `;
+            
+            this.tasksContainer.appendChild(taskElement);
+        });
+    }
+
+    showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+
+        // Show system notification if permitted
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('تطبيق المهام اليومية', {
+                body: message,
+                icon: 'https://example.com/icon.png'
+            });
+        }
+    }
+
+    startNotificationCheck() {
+        setInterval(() => {
+            this.tasks.forEach(task => {
+                if (!task.completed && !task.notified) {
+                    const now = new Date();
+                    const dueDate = new Date(task.dueDate);
+                    const timeDiff = dueDate - now;
+                    
+                    if (timeDiff > 0 && timeDiff <= 3600000) {
+                        this.showNotification(`تنبيه: المهمة "${task.title}"لقد انتهى وقت المهمة ايها الكسول`);
+                        task.notified = true;
+                        this.saveTasks();
+                    }
+                }
+            });
+        }, 60000);
+    }
+
+    startOverdueCheck() {
+        // Check every minute for overdue tasks
+        setInterval(() => {
+            const now = new Date();
+            this.tasks.forEach(task => {
+                const dueDate = new Date(task.dueDate);
+                if (!task.completed && dueDate < now) {
+                    // If task is overdue and not already being notified
+                    if (!this.notifications[task.id]) {
+                        this.startTaskReminder(task);
+                    }
+                }
+            });
+        }, 60000); // Check every minute
+    }
+
+    startTaskReminder(task) {
+        // Show initial notification
+        this.showNotification(`المهمة "${task.title}" في انتظارك! يجب عليك إنهاؤها`);
+        
+        // Set up recurring notification every 10 minutes
+        this.notifications[task.id] = setInterval(() => {
+            if (!task.completed) {
+                this.showNotification(`المهمة "${task.title}" في انتظارك! يجب عليك إنهاؤها`);
+            } else {
+                clearInterval(this.notifications[task.id]);
+                delete this.notifications[task.id];
+            }
+        }, 600000); // 10 minutes
+    }
+}
+
+const taskManager = new TaskManager();
+
+if ('Notification' in window) {
+    Notification.requestPermission();
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    if (event.target === document.getElementById('editModal')) {
+        document.getElementById('editModal').classList.remove('show');
+    }
+}
+</script>
+</body></html>
