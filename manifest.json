@@ -1,0 +1,16 @@
+{
+    "name": "Todo List App",
+    "short_name": "Todos",
+    "description": "A simple todo list application with notifications",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4CAF50",
+    "icons": [
+        {
+            "src": "https://icons8.com/icon/12780/todo-list",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}
