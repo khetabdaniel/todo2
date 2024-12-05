@@ -253,6 +253,13 @@ body {
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+<audio id="completeSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg">
+</audio>
+<audio id="deleteSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg">
+</audio>
+
 <div id="welcomePage" class="welcome-page">
     <div class="welcome-content">
         <h1>مرحباً بك في تطبيق المهام اليومية</h1>
@@ -412,6 +419,8 @@ class TaskManager {
         this.tasks = this.tasks.filter(task => task.id !== id);
         this.saveTasks();
         this.renderTasks();
+        const deleteSound = document.getElementById('deleteSound');
+        deleteSound.play();
     }
 
     toggleComplete(id) {
@@ -424,6 +433,8 @@ class TaskManager {
                     clearInterval(this.notifications[task.id]);
                     delete this.notifications[task.id];
                 }
+                const completeSound = document.getElementById('completeSound');
+                completeSound.play();
             }
             this.saveTasks();
             this.renderTasks();
